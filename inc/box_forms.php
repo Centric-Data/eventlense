@@ -9,7 +9,7 @@
   </p>
   <p>
     <label for="event_day">Event Day</label>
-    <input type="text" name="event_day" id="event_day">
+    <input type="date" name="event_day" id="event_day">
   </p>
   <p>
     <label for="event_venue">Event Venue</label>
