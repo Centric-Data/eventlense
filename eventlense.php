@@ -56,7 +56,7 @@ class EventLense
   }
     // Create meta Boxes
     public function el_custom_meta_boxes(){
-      add_meta_box( 'events_fields', __( 'Event Details' ), 'el_render_details', 'post', 'advanced', 'high' );
+      add_meta_box( 'events_fields', __( 'Event Details','eventlense' ), array( $this, 'el_render_details' ), 'post', 'advanced', 'high' );
     }
 
     // Render Meta-boxes html
