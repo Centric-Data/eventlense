@@ -61,7 +61,7 @@ class EventLense
 
     // Render Meta-boxes html
     public function el_render_details( $post ){
-      reqquire_once( EL_PLUGIN_URL . 'inc/box_forms.php' );
+      require_once( EL_PLUGIN_URL . 'inc/box_forms.php' );
     }
 
     // Render shortcode
