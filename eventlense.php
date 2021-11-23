@@ -118,7 +118,7 @@ class EventLense
         'public'                =>  true,
         'has_archive'           =>  'centric_events',
         'rewrite'               =>  array(
-          'slug'                =>  'centric_events/%events%',
+          'slug'                =>  'centric_events/events',
           'with_front'          =>  FALSE
         ),
         'hierarchical'          =>  false,

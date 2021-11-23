@@ -8,8 +8,11 @@
 
 // SHORTCODE HTML
 .events__card{
-  &:first-child{
-    border-left: 11px solid gold;
+  width: 100%;
+  max-width: 350px;
+}
+.middle_details{
+  p{
+    line-height: 1.25;
   }
-  border-left: 11px solid #8080805c;
 }

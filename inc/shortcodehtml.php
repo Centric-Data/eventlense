@@ -17,28 +17,56 @@
   $query = new WP_Query( $args );
 
 ?>
-
-<?php
-    if( $query->have_posts() ) : while( $query->have_posts() ) : $query->the_post();
-     $featured_img_url = get_the_post_thumbnail_url(get_the_ID(),'medium');
- ?>
-<div class="events__card flex justify-between border-b border-gray-300 pb-4 mb-4">
-  <div class="events__card--left w-4/5 pl-2">
-    <h3><?php the_title(); ?></h3>
-    <div class="event__details flex flex-col justify-start align-center gap-1">
-      <time class="flex align-center"><span class="material-icons">date_range</span><?php echo esc_attr( get_post_meta( get_the_ID(), 'event_day', true ) ); ?> @ <span><?php echo esc_attr( get_post_meta( get_the_ID(), 'event_time', true ) ); ?> </span> </time>
-      <h6 class="flex align-center"><span class="material-icons">location_on</span> <?php echo esc_attr( get_post_meta( get_the_ID(), 'event_venue', true ) ); ?></h6>
+<div class="events flex flex-wrap justify-between gap-1">
+  <?php
+      if( $query->have_posts() ) : while( $query->have_posts() ) : $query->the_post();
+      $featured_img_url = get_the_post_thumbnail_url(get_the_ID(),'medium');
+  ?>
+  <div class="events__card flex flex-col justify-between bg-white text-black rounded p-2 shadow-lg">
+    <div class="top__details flex gap-2">
+      <div class="bg-yellow-300 p-8 border-4 border-green-500 rounded-full h-24 w-24 flex flex-col items-center justify-center w-2/8">
+        <div class="font-semibold text-2xl">
+          <?php
+            $timestamp =  esc_attr( get_post_meta( get_the_ID(), 'event_day', true ) );
+            $totime = strtotime( $timestamp );
+            $day = date( 'd', $totime );
+            echo $day;
+          ?>
+        </div>
+        <div class="uppercase">
+          <?php
+            $month = date( 'M', $totime );
+            echo $month;
+          ?>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-base font-normal"><?php the_title(); ?></h4>
+        <div class="flex align-center gap-2 text-gray-600">
+          <h6 class="font-light flex align-center text-sm">@<?php echo esc_attr( get_post_meta( get_the_ID(), 'event_time', true ) ); ?></h6>
+          <h6 class="font-light flex align-center text-sm"><?php echo esc_attr( get_post_meta( get_the_ID(), 'event_venue', true ) ); ?></h6>
+        </div>
+      </div>
     </div>
-    <p class="">
-      <?php the_excerpt(); ?>
-    </p>
-    <a class="w-5/6 no-underline mt-8 pt-2 pb-2 pl-4 pr-4 rounded bg-green-500 text-white" href="<?php echo esc_attr( get_post_meta( get_the_ID(), 'event_link', true ) ); ?>">More Details</a>
+    <div class="middle__details mt-2 p-2 border-t border-yellow-500 text-sm text-gray-500 leading-tight">
+      <p class="leading-tight"><?php the_excerpt(); ?></p>
+    </div>
+    <div class="bottom__details flex justify-end text-sm text-gray-100">
+      <a class="uppercase no-underline text-black hover:text-yellow-500" href="
+        <?php
+          $exlink =  esc_attr( get_post_meta( get_the_ID(), 'event_link', true ) );
+          $postlink = get_permalink();
+          if( ! $exlink ){
+            echo $postlink;
+          } else {
+            echo $exlink;
+          }
+        ?>
+      ">Read More</a>
+    </div>
   </div>
-  <div class="events__card--right flex justify-end">
-    <img class="w-4/5" src="<?php echo $featured_img_url ?>" alt="Karri Saarinen presenting at Nordic Design">
-  </div>
+  <?php endwhile; else:
+        echo esc_html__( 'Sorry, no events to show', 'eventlense' );
+      endif;
+    ?>
 </div>
-<?php endwhile; else:
-      echo esc_html__( 'Sorry, no events to show', 'eventlense' );
-    endif;
-   ?>
