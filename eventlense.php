@@ -68,6 +68,15 @@ class EventLense
 
     // Register REST Route
     add_filter( 'rest_route_for_post', array( $this, 'el_rest_route_cpt' ), 10, 2 );
+
+    // Filter for custom post link
+    add_filter( 'post_type_link', array( $this, 'el_filter_post_type_link' ), 10, 2 );
+
+    // Register custom Taxonomy
+    add_action( 'init', array( $this, 'el_create_events_taxonomies' ), 0 );
+
+    // Define default term in the custom taxonomy
+    add_action( 'save_post', array( $this, 'el_default_taxonomy_term' ), 100, 2 );
   }
 
   // Enqueue Scripts
@@ -118,12 +127,12 @@ class EventLense
         'public'                =>  true,
         'has_archive'           =>  'centric_events',
         'rewrite'               =>  array(
-          'slug'                =>  'centric_events/events',
+          'slug'                =>  'centric_events/%eventscat%',
           'with_front'          =>  FALSE
         ),
         'hierarchical'          =>  false,
         'show_in_rest'          =>  true,
-        'rest_base'             =>  'documents',
+        'rest_base'             =>  'events',
         'rest_controller_class' =>  'WP_REST_Posts_Controller',
         'supports'              =>  array( 'title', 'editor', 'thumbnail' ),
         'capability_type'       =>  'post',
@@ -182,6 +191,62 @@ class EventLense
           break;
       }
     }
+
+    // Create taxonomies for the post type centric_events
+    public function el_create_events_taxonomies(){
+      $labels = array(
+        'name'          =>  _x( 'Events Categories', 'taxonomy general name', 'eventlense' ),
+        'singular_name' =>  _x( 'Event Category', 'taxonomy singular name', 'eventlense' ),
+        'search_items'  =>  __( 'Search Events Categories', 'eventlense' ),
+        'all_items'     =>  __( 'All Events Categories', 'eventlense' ),
+        'edit_item'     =>  __( 'Edit Events Categories', 'eventlense' ),
+        'update_item'   =>  __( 'Update Events Category', 'eventlense' ),
+        'add_new_item'  =>  __( 'Add New Events Category', 'eventlense' ),
+        'new_item_name' =>  __( 'New Events Category Name', 'eventlense' ),
+        'menu_name'     =>  __( 'Event Categories', 'eventlense' ),
+      );
+      $args = array(
+        'hierarchical'  => true,
+        'labels'        =>  $labels,
+        'show_ui'       =>  true,
+        'show_admin_column' =>  true,
+        'query_var'         =>  true,
+        'rewrite'           =>  array(
+          'slug'        =>  'eventscat',
+          'with_front'  =>  false,
+        ),
+      );
+      register_taxonomy( 'eventscat', array( 'centric_events' ), $args );
+    }
+
+    // Changing the permalink
+    public function el_filter_post_type_link( $link, $post ){
+      if( $post->post_type !== 'centric_events' ){
+        return $link;
+      }
+
+      if( $cats = get_the_terms( $post->ID, 'eventscat' ) ){
+        $link = str_replace( '%eventscat%', array_pop( $cats )->slug, $link );
+        return $link;
+      }
+    }
+
+    // Default term in the custom Taxonomy
+    public function el_default_taxonomy_term( $post_id, $post ){
+      if( 'publish' === $post->post_status ){
+        $defaults = array(
+          'eventscat'   =>  array( 'other' ),
+        );
+        $taxonomies = get_object_taxonomies( $post->post_type );
+        foreach ( (array) $taxonomies as $taxonomy ) {
+          $terms = wp_get_post_terms( $post_id, $taxonomy );
+          if( empty( $terms ) && array_key_exists( $taxonomy, $defaults ) ){
+            wp_set_object_terms( $post_id, $defaults[$taxonomy], $taxonomy );
+          }
+        }
+      }
+    }
+
 }
 new EventLense;
 
